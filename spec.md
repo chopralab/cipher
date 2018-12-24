@@ -1,10 +1,11 @@
 
 
-# MMTF Specification
+# CIPHER Specification
 
 *Version*: v1.1dev
 
-The **m**acro**m**olecular **t**ransmission **f**ormat (MMTF) is a binary encoding of biological structures. It includes the coordinates, the topology and associated data. Specifically, a large subset of the data in mmCIF or PDB files can be represented. Pronounced goals are a reduced file size for efficient transmission over the Internet or from hard disk to memory and fast decoding/parsing speed. Additionally, the format aims to be easily understood and implemented to facilitate its wide dissemination. For testing encoder and decoder implementations a [test suite](test-suite/) is available.
+
+The **C**hemical **I**ndex for **P**roperties based on **H**ierarchical **E**xtendable **R**epresentation (CIPHER) is a binary encoding of chemical structures.  It is a superset of the [MMTF](http://mmtf.rcsb.org/) format and is designed to remain compatible with this format. CIPHER extensions include the ability to encode advanced graph structures, reactivity, and spectral information.
 
 
 ## Table of contents
@@ -29,26 +30,26 @@ The **m**acro**m**olecular **t**ransmission **f**ormat (MMTF) is a binary encodi
 
 ## Overview
 
-This specification describes a set of required and optional [fields](#fields) representing molecular structures and associated data. The fields are limited to six primitive [types](#types) for efficient serialization and deserialization using the binary [MessagePack](http://msgpack.org/) format. The [fields](#fields) in MMTF are stored in a binary [container](#container) format. The top-level of the container contains the field names as keys and field data as values. To describe the layout of data in MMTF we use the [JSON](http://www.json.org/) notation throughout this document.
+This specification describes a set of required and optional [fields](#fields) representing molecular structures and associated data. The fields are limited to six primitive [types](#types) for efficient serialization and deserialization using the binary [MessagePack](http://msgpack.org/) format. The [fields](#fields) in MMTF are stored in a binary [container](#container) format. The top-level of the container contains the field names as keys and field data as values. To describe the layout of data in CIPHER we use the [JSON](http://www.json.org/) notation throughout this document.
 
-The first step of decoding MMTF is decoding the MessagePack-encoded container. Many of the resulting MMTF fields do not need to be decoded any further. However, to allow for custom compression some fields are given as binary data and must be decoded using the [strategies](#encodings) described below. For maximal size savings the binary MMTF data can be compressed using general purpose algorithms like [gzip](https://www.gnu.org/software/gzip/) or [brotli](https://github.com/google/brotli).
+The first step of decoding CIPHER is decoding the MessagePack-encoded container. Many of the resulting CIPHER fields do not need to be decoded any further. However, to allow for custom compression some fields are given as binary data and must be decoded using the [strategies](#encodings) described below. For maximal size savings the binary CIPHER data can be compressed using general purpose algorithms like [gzip](https://www.gnu.org/software/gzip/) or [brotli](https://github.com/google/brotli).
 
-The fields in the MMTF format group data of the same type together to create a flat data-structure, for instance, the coordinates of all atoms are stored together, instead of in atom objects with other atom-related data. This avoids imposing a deeply-nested hierarchical structure on consuming programs, while still allowing efficient [traversal](traversal) of models, chains, groups, and atoms.
+The fields in the CIPHER format group data of the same type together to create a flat data-structure, for instance, the coordinates of all atoms are stored together, instead of in atom objects with other atom-related data. This avoids imposing a deeply-nested hierarchical structure on consuming programs, while still allowing efficient [traversal](traversal) of models, chains, groups, and atoms.
 
 
 ## Container
 
-In principle any serialization format that supports the [types](#types) described below can be used to store the above [fields](#fields). MMTF files (specifically files with the `.mmtf` extension) use the binary [MessagePack](http://msgpack.org/) serialization format.
+In principle any serialization format that supports the [types](#types) described below can be used to store the above [fields](#fields). CIPHER files (specifically files with the `.cipher` extension) use the binary [MessagePack](http://msgpack.org/) serialization format.
 
 
 ### MessagePack
 
-The MessagePack format (version 5) is used as the binary container format of MMTF. The MessagePack [specification](https://github.com/msgpack/msgpack/blob/master/spec.md) describes the data types and the data layout. Encoding and decoding libraries for MessagePack are available in many languages, see the MessagePack [website](http://msgpack.org/).
+The MessagePack format (version 5) is used as the binary container format of CIPHER. The MessagePack [specification](https://github.com/msgpack/msgpack/blob/master/spec.md) describes the data types and the data layout. Encoding and decoding libraries for MessagePack are available in many languages, see the MessagePack [website](http://msgpack.org/).
 
 
 ### JSON
 
-The test suite will additionally provide files representing the MMTF [fields](#fields) as [JSON](http://www.json.org/) to help validating implementations of this specification.
+The test suite will additionally provide files representing the CIPHER [fields](#fields) as [JSON](http://www.json.org/) to help validating implementations of this specification.
 
 
 ## Types
@@ -251,7 +252,7 @@ This section describes the binary layout of the header and the encoded data as w
 
 ## Encodings
 
-The following general encoding strategies are used to compress the data contained in MMTF files.
+The following general encoding strategies are used to compress the data contained in CIPHER files.
 
 
 ### Run-length encoding
@@ -438,6 +439,11 @@ The following table lists all top level fields, including their [type](#types) a
 | [modelProperties](#modelproperties)         | [Map<String, Array\|Binary>](#types)                               |          |
 | [extraProperties](#extraproperties)         | [Map<String, String\|Float\|Integer\|Map\|Array\|Binary>](#types)  |          |
 
+## Additional CIPHER fields
+
+| Name                                        | Type                                                               | Required |
+|---------------------------------------------|--------------------------------------------------------------------|:--------:|
+| [spectra](#spectra)                         | [Array](#types)                                                    |          |
 
 ### Format data
 
@@ -868,7 +874,7 @@ The `sequence` string contains the full construct, not just the resolved residue
 *Type*: [Binary](#types) data that decodes into an array of 32-bit signed integers.
 
 *Description*: Pairs of values represent indices of covalently bonded atoms. The indices point to the [Atom data](#atom-data) arrays. Only covalent bonds may be given.
-*Note*: This is an optional field in that if your mmtf file contains no bonds, the field is not required to exist (for decoding purposes).  If bonds exist this must be defined.
+*Note*: This is an optional field in that if your cipher file contains no bonds, the field is not required to exist (for decoding purposes).  If bonds exist this must be defined.
 
 *Example*:
 
@@ -888,7 +894,7 @@ In the following example there are three bonds, one between the atoms with the i
 *Type*: [Binary](#types) data that decodes into an array of 8-bit signed integers.
 
 *Description*: Array of bond orders for bonds in `bondAtomList`. Must be values -1, 1, 2, 3, or 4, defining unknown, single, double, triple, and quadruple bonds.
-*Note*: This field is optional, it is not required that you know the order of the bonds when writing mmtf files. However if you have the information, we encourage
+*Note*: This field is optional, it is not required that you know the order of the bonds when writing cipher files. However if you have the information, we encourage
 you to include it!
 
 *Example*:
@@ -908,7 +914,7 @@ In the following example there are bond orders given for three bonds. The first 
 *Type*: [Binary](#types) data that decodes into an array of 8-bit signed integers ([type 16](#run-length-encoded-8-bit-array)).
 
 *Description*: Array of bond Resonances for bonds in `bondAtomList`. Must be -1: resonance is unknown, 0: no resonance, or 1: resonance exists.
-*Note*: This field is optional, it is not required that you know the resonance of bonds when writing mmtf files. However if you have the information, we encourage
+*Note*: This field is optional, it is not required that you know the resonance of bonds when writing cipher files. However if you have the information, we encourage
 you to include it!
 
 Possible pairings between the `bondResonanceList` and `bondOrderList` are shown below.
@@ -1705,6 +1711,30 @@ data = {
 | cameraPosition        | cartesian (x,y,z)                      |
 | cameraDirectionVector | cartesian vector [(x,y,z), (x,y,z)]    |
 
+#### spectra
+
+*Type*: [Array](#types) of `spectra` objects with the following fields:
+
+| Name                 | Type              | Description                                                        | Required |
+|----------------------|-------------------|--------------------------------------------------------------------|:--------:|
+| groupId              | [Integer](#types) | Pointer to the group of which the mass spect                       |    Y     |
+| spectrumType         | [String](#types)  | Name of the spectra encoded by this object                         |    Y     |
+| independantVariable  | [Array](#types)   | Array of floating point numbers which represent the 'X' axis       |    Y     |
+| responseVairable     | [Array](#types)   | Array of floating point numbers which represent the 'Y' axis       |    Y     |
+
+*Vocabulary*: Known values for the groupType field `spectrumType` are `IR`, `MS`, and `NMR`.
+
+*Example*:
+
+```JSON
+[
+    {
+        "groupId": "1",
+        "spectrumType": "IR",
+        "independantVariable": [300, 301, 302, 303, 304, 305],
+        "responseVairable": [ 1, 2, 5, 10, 5, 2 ],
+    }
+]
 
 ## Traversal
 
