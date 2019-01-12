@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file, following the suggestions of [Keep a CHANGELOG](http://keepachangelog.com/). This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [c0.1] - 2019-01-12
+### Added
+- Initial spectra support
 
 ## [v1.0] - 2016-08-15
 ### Added

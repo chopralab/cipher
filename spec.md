@@ -1721,6 +1721,8 @@ data = {
 | spectrumType         | [String](#types)  | Name of the spectra encoded by this object                         |    Y     |
 | independantVariable  | [Array](#types)   | Array of floating point numbers which represent the 'X' axis       |    Y     |
 | responseVairable     | [Array](#types)   | Array of floating point numbers which represent the 'Y' axis       |    Y     |
+| independantUnits     | [String](#types)  | Units for the X-axis                                               |          |
+| responseUnits        | [String](#types)  | Units for the Y-axis                                               |          |
 
 *Vocabulary*: Known values for the groupType field `spectrumType` are `IR`, `MS`, and `NMR`.
 
